@@ -1,0 +1,24 @@
+{
+  "name": "express-server-timing",
+  "version": "1.0.0",
+  "description": "Server Timing middleware for Express",
+  "main": "index.js",
+  "dependencies": {
+    "on-headers": "^1.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pd4d10/express-servertiming.git"
+  },
+  "keywords": [],
+  "author": "pd4d10 <pd4d10@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pd4d10/express-servertiming/issues"
+  },
+  "homepage": "https://github.com/pd4d10/express-servertiming#readme"
+}
