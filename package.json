@@ -1,6 +1,6 @@
 {
   "name": "express-server-timing",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Server Timing middleware for Express",
   "main": "index.js",
   "dependencies": {
