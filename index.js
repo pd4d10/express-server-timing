@@ -12,9 +12,9 @@ module.exports = serverTiming
  */
 function format(key, time, description) {
   if (description) {
-    return key + ':' + time + ';' + '"' + description + '"'
+    return key + '=' + time + ';' + '"' + description + '"'
   }
-  return key + ':' + time
+  return key + '=' + time
 }
 
 function serverTiming(options) {
