@@ -2,52 +2,62 @@
  *
  */
 
-var onHeaders = require('on-headers')
+const onHeaders = require('on-headers')
+const SERVER_TIMING_HEADER = 'Server-Timing'
 
-var SERVER_TIMING_HEADER = 'Server-Timing'
-
-module.exports = servertiming
+module.exports = serverTiming
 
 /**
  * Format
  */
-function format(key, value, description) {
+function format(key, time, description) {
   if (description) {
-    return key + ':' + value + ';' + '"' + description + '"'
+    return key + ':' + time + ';' + '"' + description + '"'
   }
-  return key + ':' + value
+  return key + ':' + time
 }
 
 /**
- * Add server timing header
- *
+ * Add server timing to response headers
  */
-function addHeader() {
-  if (!this.getHeader(SERVER_TIMING_HEADER)) {
-    this.setHeader(SERVER_TIMING_HEADER, 'abc')
+function addHeader(headers) {
+  if (this.getHeader(SERVER_TIMING_HEADER)) {
+    console.warn('Server timing header already exists, aborted')
+    return
   }
+
+  const headerString = headers.map(header => {
+    return format(header.key, header.time, header.description)
+  })
+
+  this.setHeader(SERVER_TIMING_HEADER, headerString)
 }
 
-/**
- *
- */
-function servertiming(options) {
-  var items = []
-
-  function timeingStart(key, description) {
-    items.push({
-      key: key,
-      description: description,
-      time: 0
-    })
-  }
-
-  function timeingEnd(key) {
-  }
+function serverTiming(options) {
+  const headers = {}
 
   return function (req, res, next) {
-    req.timingStart = timingStart
-    req.timingEnd = timingEnd
+    /**
+     * Use process.hrtime() to get high-resolution real time
+     * See https://nodejs.org/api/process.html#process_process_hrtime_time
+     */
+    function serverTimingStart(key, description) {
+      headers[key] = ({
+        key,
+        description,
+        startAt: process.hrtime()
+      })
+    }
+
+    function serverTimingEnd(key) {
+      const diff = process.hrtime(headers[key].startAt)
+      const time = diff[0] + diff[1] * 1e-9
+      headers[key].time = time
+    }
+
+    // Assign to res
+    res.serverTimingStart = serverTimingStart
+    res.serverTimingEnd = serverTimingEnd
 
     onHeaders(res, addHeader)
     next()
