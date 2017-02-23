@@ -17,22 +17,6 @@ function format(key, time, description) {
   return key + ':' + time
 }
 
-/**
- * Add server timing to response headers
- */
-function addHeader(headers) {
-  if (this.getHeader(SERVER_TIMING_HEADER)) {
-    console.warn('Server timing header already exists, aborted')
-    return
-  }
-
-  const headerString = headers.map(header => {
-    return format(header.key, header.time, header.description)
-  })
-
-  this.setHeader(SERVER_TIMING_HEADER, headerString)
-}
-
 function serverTiming(options) {
   const headers = {}
 
@@ -59,7 +43,23 @@ function serverTiming(options) {
     res.serverTimingStart = serverTimingStart
     res.serverTimingEnd = serverTimingEnd
 
-    onHeaders(res, addHeader)
+    /**
+     * Add server timing to response headers
+     */
+    onHeaders(res, function addHeader() {
+      if (this.getHeader(SERVER_TIMING_HEADER)) {
+        console.warn('Server timing header already exists, aborted')
+        return
+      }
+
+      const headerString = Object.keys(headers).map(key => {
+        const header = headers[key]
+        return format(header.key, header.time, header.description)
+      }).join(',')
+
+      this.setHeader(SERVER_TIMING_HEADER, headerString)
+    })
+
     next()
   }
 }
