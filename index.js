@@ -34,6 +34,9 @@ function serverTiming(options) {
     }
 
     function serverTimingEnd(key) {
+      if (!headers[key]) {
+        return;
+      }
       const diff = process.hrtime(headers[key].startAt)
       const time = diff[0] + diff[1] * 1e-9
       headers[key].time = time
