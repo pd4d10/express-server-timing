@@ -50,8 +50,8 @@ function serverTiming(options) {
      * Add server timing to response headers
      */
     onHeaders(res, function addHeader() {
-      var existingHeaders = this.getHeader(SERVER_TIMING_HEADER)
-      const headerString = (existingHeaders || []).concat(Object.keys(headers).map(key => {
+      const existingHeaders = this.getHeader(SERVER_TIMING_HEADER)
+      const headerString = [].concat(existingHeaders || []).concat(Object.keys(headers).map(key => {
         const header = headers[key]
         return format(header.key, header.time, header.description)
       })).join(',')
