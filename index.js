@@ -50,15 +50,11 @@ function serverTiming(options) {
      * Add server timing to response headers
      */
     onHeaders(res, function addHeader() {
-      if (this.getHeader(SERVER_TIMING_HEADER)) {
-        console.warn('Server timing header already exists, aborted')
-        return
-      }
-
-      const headerString = Object.keys(headers).map(key => {
+      var existingHeaders = this.getHeader(SERVER_TIMING_HEADER)
+      const headerString = (existingHeaders || []).concat(Object.keys(headers).map(key => {
         const header = headers[key]
         return format(header.key, header.time, header.description)
-      }).join(',')
+      })).join(',')
 
       this.setHeader(SERVER_TIMING_HEADER, headerString)
     })
