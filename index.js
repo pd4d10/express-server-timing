@@ -34,6 +34,9 @@ function serverTiming(options) {
     }
 
     function serverTimingEnd(key) {
+      if (!headers[key]) {
+        return;
+      }
       const diff = process.hrtime(headers[key].startAt)
       const time = diff[0] + diff[1] * 1e-9
       headers[key].time = time
@@ -47,15 +50,11 @@ function serverTiming(options) {
      * Add server timing to response headers
      */
     onHeaders(res, function addHeader() {
-      if (this.getHeader(SERVER_TIMING_HEADER)) {
-        console.warn('Server timing header already exists, aborted')
-        return
-      }
-
-      const headerString = Object.keys(headers).map(key => {
+      const existingHeaders = this.getHeader(SERVER_TIMING_HEADER)
+      const headerString = [].concat(existingHeaders || []).concat(Object.keys(headers).map(key => {
         const header = headers[key]
         return format(header.key, header.time, header.description)
-      }).join(',')
+      })).join(',')
 
       this.setHeader(SERVER_TIMING_HEADER, headerString)
     })
